@@ -53,26 +53,48 @@
 //Домашнее задание
 
 //Задание 1
-console.log(3);//Вывод числа
-console.log('03');//Вывод строки
+// console.log(3);//Вывод числа
+// console.log('03');//Вывод строки
 
 //Задание 2
-console.log('Добро '+'пожаловать '+' на курс,' + ' Андрей' );
+// console.log('Добро '+'пожаловать '+' на курс,' + ' Андрей' );
 
 //Задание 3
-let now = new Date();
+// let now = new Date();
 //alert(now.getDate()+" "+ (now.getMonth()+1) + " " + now.getFullYear());
 //alert("Вторник, 11 апреля 2023");
 
 //Задание 4
-document.getElementById("one").innerHTML = "Hello, world!";
+// document.getElementById("one").innerHTML = "Hello, world!";
 
 //Задание 5
-console.log(typeof 1);
-console.log(typeof 1n);
-console.log(typeof 1<2);
-console.log(typeof "string");
-console.log(typeof Symbol('object'));
-console.log(typeof now);
-console.log(typeof undefined);
-console.log(typeof alert);
+// console.log(typeof 1);
+// console.log(typeof 1n);
+// console.log(typeof 1<2);
+// console.log(typeof "string");
+// console.log(typeof Symbol('object'));
+// console.log(typeof now);
+// console.log(typeof undefined);
+// console.log(typeof alert);
+
+//Домашнее задание №3
+//Задание 1
+let inp = document.querySelector('.text');
+let btn = document.querySelector('.check');
+let out = document.querySelector('.out');
+
+btn.onclick = function(){
+    let e = inp.value;
+    out.innerHTML = e;
+    inp.value = "";
+}
+
+//Задание 2
+let inputLabel = prompt("Введите число");
+if(inputLabel>100){
+    document.querySelector('#out2').innerHTML = inputLabel;
+} else if(inputLabel<100){
+    console.log(inputLabel);
+} else {
+    console.log("Поздравляем! Вы попали в нужную точку, задание в которой не регламентировано-)");
+}
