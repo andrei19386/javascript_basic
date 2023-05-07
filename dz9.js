@@ -6,18 +6,24 @@ btn5.onclick = function(){
     h2.innerHTML = mas[4];//Индекс пятого элемента равен 4, поскольку нумерация начинается с нуля
 }
 
+
 //Задание 2
+function getElements(isOdd,element){
+    let masResult = [];
+    for(let i = 0; i < masOfNumbers.length; i++){
+        if(masOfNumbers[i]%2==isOdd) masResult.push(masOfNumbers[i]);
+    } //Перебираем все элементы и записываем в новый массив
+    for(let i = 0; i < masResult.length; i++){
+        element.innerHTML += masResult[i] + " ";
+    }//Выводим элементы из массива в элемент Web-страницы
+}
+
 const masOfNumbers = [20, 75, 60, 90, 25, 113, 444];
-let masEven = [];
 const btnEven = document.querySelector('.returnEven');
 btnEven.onclick = function(){
     let even = document.querySelector('.even');
-    for(let i = 0; i < masOfNumbers.length; i++){
-        if(masOfNumbers[i]%2==0) masEven.push(masOfNumbers[i]);
-    } //Перебираем все элементы и четные записываем в новый массив
-    for(let i = 0; i < masEven.length; i++){
-        even.innerHTML += masEven[i] + " ";
-    }//Выводим элементы из массива в элемент Web-страницыы
+    getElements(false,even);
+    
 }
 
 //Задание 3
@@ -25,12 +31,7 @@ let masOdd = [];
 const btnOdd = document.querySelector('.returnOdd');
 btnOdd.onclick = function(){
     let odd = document.querySelector('.odd');
-    for(let i = 0; i < masOfNumbers.length; i++){
-        if(masOfNumbers[i]%2!=0) masOdd.push(masOfNumbers[i]);
-    } //Перебираем все элементы и нечетные записываем в новый массив
-    for(let i = 0; i < masOdd.length; i++){
-        odd.innerHTML += masOdd[i] + " ";
-    }//Выводим элементы из массива в элемент Web-страницыы
+    getElements(true,odd);
 }
 
 //Задание 4
