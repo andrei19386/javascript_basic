@@ -19,7 +19,7 @@
  
 
 let xhttp = new XMLHttpRequest();
-
+xhttp.withCredentials = true;
 
 xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
@@ -27,10 +27,9 @@ xhttp.onreadystatechange = function(){
     }
 }
 
-//xhttp.open('GET','http://127.0.0.1:8080/api/v1/geo/countries/',true);
+//xhttp.open('GET','http://127.0.0.1:8080/admin',true);
 
-xhttp.open('GET','http://127.0.0.1:8081',true);
-
+xhttp.open('GET','https://automarine25.ru/',true);
 
 xhttp.send();
 
