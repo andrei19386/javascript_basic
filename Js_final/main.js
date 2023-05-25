@@ -1,5 +1,5 @@
-let storageMap = new Map();
-let completedMap = new Map();
+let storageMap = new Map();//Имитирует выделенную память под поставленные, но не завершенные задачи
+let completedMap = new Map();//Имитирует выделенную память под завершенные задачи
 
 showTasks();
 
@@ -14,7 +14,6 @@ document.querySelector('.tasks-content').onclick = function(event){
      }
      
 }
-
 
 function editItem(target) {
     let newValue = prompt("Введите новое значение:");
@@ -47,20 +46,20 @@ function changeCompletedStatus(target,storageMap){
             document.querySelector('.tasks-completed').firstElementChild.innerHTML = completedMap.size;
             document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size; 
     } else {
-        let value = completedMap.get(target.firstElementChild.name);
-        target.style.textDecoration = 'none';
-        target.children[0].style.display='flex';
-        target.children[1].style.display='flex';
-        completedMap.delete(target.firstElementChild.name);
-        storageMap.set(target.firstElementChild.name,value)         
-        localStorage.setItem(target.firstElementChild.name,JSON.stringify([value,0]));
-        document.querySelector('.tasks-completed').firstElementChild.innerHTML = completedMap.size;
-        document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size; 
+            let value = completedMap.get(target.firstElementChild.name);
+            target.style.textDecoration = 'none';
+            target.children[0].style.display='flex';
+            target.children[1].style.display='flex';
+            completedMap.delete(target.firstElementChild.name);
+            storageMap.set(target.firstElementChild.name,value)         
+            localStorage.setItem(target.firstElementChild.name,JSON.stringify([value,0]));
+            document.querySelector('.tasks-completed').firstElementChild.innerHTML = completedMap.size;
+            document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size; 
     }
 }
 
 
-function generateHTML(key,value){
+function generateHTML(key,value){//Повторяющийся фрагмент генерации HTML-кода при добавлении, редактировании и отображении todolist
     return `<span class="task-box" id=task_${key}>
     ${value}
     <button class="delete" name=${key}>delete</button><button class="edit" name=${key}>edit</button></span>`;
@@ -88,7 +87,7 @@ document.querySelector('.plus').onclick = () => {
 
 function showTasks(){
      
-     storageMap = getMapFromLocalStorage('0');
+     storageMap = getMapFromLocalStorage('0');//get-запросы
      completedMap = getMapFromLocalStorage('1');
 
     clearTaskBoxes();
@@ -104,6 +103,7 @@ function showTasks(){
 
 }
 
+//Очистка фрагментов, чтобы при перезагрузке страницы не было добавления дублирующих записей
 function clearTaskBoxes() {
     let elements = document.querySelectorAll('.task-box');
     for (let element of elements) {
@@ -111,6 +111,7 @@ function clearTaskBoxes() {
     }
 }
 
+//Формирует tasks-content
 function formHTMLTaskBox(storageMap) {
     for (let entry of storageMap) {
         document.querySelector('.tasks-content').innerHTML += generateHTML(entry[0],entry[1]);
@@ -124,6 +125,8 @@ function formHTMLTaskBox(storageMap) {
     }
 }
 
+//Определяет максимальный ключ в Map. Это нужно, чтобы избежать повторения ключей 
+//при добавлении новых элементов (новый добавляется увеличением максимального занчения ключа на 1)
 function getMaxKey(storageMap){
     let max = 0;
     for(let entry of storageMap){
@@ -134,7 +137,8 @@ function getMaxKey(storageMap){
     return max;
 }
 
-
+//Загружает из localStorage данные в списки задач storageMap и completedMap
+//id - идентификатор статуса задачи в localStorage: 0 - не выполнена, 1 - выполнена
 function getMapFromLocalStorage(id){
     let map = new Map();
     for(let i=0; i < localStorage.length;i++){
