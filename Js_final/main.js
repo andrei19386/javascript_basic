@@ -1,12 +1,70 @@
-
 let storageMap = new Map();
-showTasks();//get-запрос
+let completedMap = new Map();
+
+showTasks();
+
+document.querySelector('.tasks-content').onclick = function(event){
+     let target = event.target;
+     switch(target.className){
+        case 'delete': deleteItem(target); 
+        break;
+        case 'edit': editItem(target);
+        break;
+        case 'task-box': changeCompletedStatus(target,storageMap);
+     }
+     
+}
 
 
+function editItem(target) {
+    let newValue = prompt("Введите новое значение:");
+    localStorage.setItem(target.name, JSON.stringify([newValue, 0])); //put-запрос
+    target.parentElement.outerHTML = generateHTML(target.name, newValue);
+    storageMap.set(target.name, newValue);
+}
 
-//Пока заглушка
-let countCompleted = 3;
-document.querySelector('.tasks-completed').firstElementChild.innerHTML = countCompleted;
+function deleteItem(target) {
+    localStorage.removeItem(target.name); //delete-запрос
+    console.log(target.parentElement);
+    target.parentElement.remove();
+    console.log(target.name);
+    storageMap.delete(target.name);
+    document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size;
+    if (storageMap.size + completedMap.size == 0) {
+        document.querySelector('.no-tasks-message').style.display = "flex";
+    }
+}
+
+function changeCompletedStatus(target,storageMap){
+    if(storageMap.has(target.firstElementChild.name)){
+            let value = storageMap.get(target.firstElementChild.name);
+            target.style.textDecoration = 'line-through';
+            target.children[0].style.display='none';
+            target.children[1].style.display='none';
+            storageMap.delete(target.firstElementChild.name);
+            completedMap.set(target.firstElementChild.name,value)         
+            localStorage.setItem(target.firstElementChild.name,JSON.stringify([value,1]));
+            document.querySelector('.tasks-completed').firstElementChild.innerHTML = completedMap.size;
+            document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size; 
+    } else {
+        let value = completedMap.get(target.firstElementChild.name);
+        target.style.textDecoration = 'none';
+        target.children[0].style.display='flex';
+        target.children[1].style.display='flex';
+        completedMap.delete(target.firstElementChild.name);
+        storageMap.set(target.firstElementChild.name,value)         
+        localStorage.setItem(target.firstElementChild.name,JSON.stringify([value,0]));
+        document.querySelector('.tasks-completed').firstElementChild.innerHTML = completedMap.size;
+        document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size; 
+    }
+}
+
+
+function generateHTML(key,value){
+    return `<span class="task-box" id=task_${key}>
+    ${value}
+    <button class="delete" name=${key}>delete</button><button class="edit" name=${key}>edit</button></span>`;
+}
 
 
 
@@ -14,18 +72,14 @@ document.querySelector('.plus').onclick = () => {
     let taskText = document.querySelector('.add-task').firstElementChild.value;
     if(taskText != ''){
         let currentKey = +getMaxKey(storageMap) + 1;
-        localStorage.setItem(currentKey,taskText);   //post-запрос
+        localStorage.setItem(currentKey,JSON.stringify([taskText,0]));   //post-запрос
         document.querySelector('.no-tasks-message').style.display = "none";
 
 
-        document.querySelector('.tasks-content').innerHTML += `<span class="task-box" id=task_${currentKey}>
-            ${taskText}
-            <button class="delete" name=${currentKey}>delete</button><button class="edit">edit</button></span>`;
-            storageMap.set(currentKey,taskText);
+        document.querySelector('.tasks-content').innerHTML += generateHTML(currentKey,taskText);
+            storageMap.set(`${currentKey}`,taskText);
             document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size;
-            console.log(currentKey);
-            addDeleteAction(storageMap);
-        document.querySelector('.add-task').firstElementChild.value="";
+            document.querySelector('.add-task').firstElementChild.value="";
     } else {
         alert("Поле ввода не может быть пустым!")
     }
@@ -34,19 +88,19 @@ document.querySelector('.plus').onclick = () => {
 
 function showTasks(){
      
-     storageMap = getMapFromLocalStorage();
-     console.log(storageMap);
+     storageMap = getMapFromLocalStorage('0');
+     completedMap = getMapFromLocalStorage('1');
 
     clearTaskBoxes();
-    if(storageMap.size == 0){
+    if(storageMap.size + completedMap.size == 0){
         document.querySelector('.no-tasks-message').style.display = "flex";
     } else {
         document.querySelector('.no-tasks-message').style.display = "none";
         formHTMLTaskBox(storageMap);
     }
     
-    document.querySelector('.tasks-count').firstElementChild.innerHTML = localStorage.length;
-    addDeleteAction(storageMap);
+    document.querySelector('.tasks-completed').firstElementChild.innerHTML = completedMap.size;
+    document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size; 
 
 }
 
@@ -59,9 +113,14 @@ function clearTaskBoxes() {
 
 function formHTMLTaskBox(storageMap) {
     for (let entry of storageMap) {
-        document.querySelector('.tasks-content').innerHTML += `<span class="task-box" id=task_${entry[0]}>
-            ${entry[1]}
-            <button class="delete" name=${entry[0]}>delete</button><button class="edit" >edit</button></span>`;
+        document.querySelector('.tasks-content').innerHTML += generateHTML(entry[0],entry[1]);
+    }
+    for (let entry of completedMap) {
+        document.querySelector('.tasks-content').innerHTML += generateHTML(entry[0],entry[1]);
+        let target = document.querySelector(`#task_${entry[0]}`);
+        target.style.textDecoration = 'line-through';
+        target.children[0].style.display='none';
+        target.children[1].style.display='none';
     }
 }
 
@@ -75,21 +134,15 @@ function getMaxKey(storageMap){
     return max;
 }
 
-function addDeleteAction(storageMap){
-    for(let entry of storageMap){  
-        document.querySelector(`#task_${entry[0]} .delete`).onclick = function(){
-            localStorage.removeItem(this.getAttribute("name"));//delete-запрос
-            this.parentElement.remove();
-            storageMap.delete(entry[0]); 
-            document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size;        
-        };
-    }
-}
 
-function getMapFromLocalStorage(){
+function getMapFromLocalStorage(id){
     let map = new Map();
     for(let i=0; i < localStorage.length;i++){
-        map.set(localStorage.key(i),localStorage.getItem(localStorage.key(i)));
+        let item = JSON.parse(localStorage.getItem(localStorage.key(i)));
+        if(item[1]==id){
+            map.set(localStorage.key(i),item[0]);
+        }
     }
     return map;
 }
+
