@@ -24,9 +24,7 @@ function editItem(target) {
 
 function deleteItem(target) {
     localStorage.removeItem(target.name); //delete-запрос
-    console.log(target.parentElement);
     target.parentElement.remove();
-    console.log(target.name);
     storageMap.delete(target.name);
     document.querySelector('.tasks-count').firstElementChild.innerHTML = storageMap.size;
     if (storageMap.size + completedMap.size == 0) {
